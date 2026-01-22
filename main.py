@@ -1,30 +1,11 @@
 import streamlit as st
 
-st.set_page_config(page_title="AI Resume Analyzer")
-
-st.title("AI Resume Analyzer & Skill Gap Recommendation System")
-
-st.write(
-    "This application analyzes a student's resume and identifies missing skills "
-    "based on the selected job role."
-)
-
-resume_text = st.text_area(
-    "Paste Resume Text Here",
-    height=200
-)
-
-role = st.selectbox(
-    "Select Target Job Role",
-    ["Java Developer", "Data Analyst", "Web Developer"]
-)
-
 if st.button("Analyze Resume"):
     if resume_text.strip() == "":
         st.warning("Please paste resume text")
     else:
+        # 1. Generate AI prompt (optional, for showing AI workflow)
         st.subheader("Generated AI Analysis Prompt")
-
         prompt = f"""
 You are an AI Resume Analyzer.
 
@@ -43,3 +24,28 @@ Tasks:
 Provide output in bullet points.
 """
         st.code(prompt)
+
+        # 2. --- Skill Gap Calculation ---
+        # Predefined required skills for each role
+        role_skills = {
+            "Java Developer": ["Java", "OOP", "Spring", "SQL", "Git"],
+            "Data Analyst": ["Python", "SQL", "Excel", "Power BI", "Statistics"],
+            "Web Developer": ["HTML", "CSS", "JavaScript", "React", "Git"]
+        }
+
+        # Convert resume text to lowercase for matching
+        resume_lower = resume_text.lower()
+
+        # Find skills present in resume
+        found_skills = []
+        for skill in role_skills[role]:
+            if skill.lower() in resume_lower:
+                found_skills.append(skill)
+
+        # Find missing skills
+        missing_skills = [skill for skill in role_skills[role] if skill not in found_skills]
+
+        # Display results
+        st.subheader("Skill Gap Analysis")
+        st.write("Skills Found:", found_skills if found_skills else "None")
+        st.write("Missing Skills:", missing_skills if missing_skills else "None")
